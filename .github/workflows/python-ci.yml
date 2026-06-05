@@ -1,0 +1,43 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Install Dependencies
+        run: |
+          if [ -f pyproject.toml ]; then
+            uv sync
+          fi
+
+      - name: Check Formatting (Black)
+        run: |
+          uv run black --check --diff .
+
+      - name: Check Style (Flake8)
+        run: |
+          uv run flake8 .
+
+      - name: Verify Python Syntax
+        run: |
+          find . -name "*.py" \
+            -not -path "./.venv/*" \
+            -exec python -m py_compile {} \;

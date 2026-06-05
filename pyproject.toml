@@ -1,0 +1,14 @@
+[project]
+name = "cis_340"
+version = "0.1.0"
+requires-python = ">=3.13"
+
+[tool.black]
+line-length = 88
+
+[dependency-groups]
+dev = [
+    "black",
+    "flake8",
+    "pre-commit>=4.6.0",
+]
