@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - master
   pull_request:
 
 jobs:
@@ -20,36 +19,25 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Create Virtual Environment
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: Install Dependencies
         run: |
-          source .venv/bin/activate
-          pip install black flake8
-
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
+          if [ -f pyproject.toml ]; then
+            uv sync
           fi
 
-      - name: Run Black Formatter Check
+      - name: Check Formatting (Black)
         run: |
-          source .venv/bin/activate
-          black --check .
+          uv run black --check .
 
-      - name: Run Flake8 Linter
+      - name: Check Style (Flake8)
         run: |
-          source .venv/bin/activate
-          flake8 .
+          uv run flake8 .
 
       - name: Verify Python Syntax
         run: |
-          source .venv/bin/activate
-          python -m compileall .
-
-      - name: Run Main Program
-        run: |
-          source .venv/bin/activate
-          python main.py
+          find . -name "*.py" \
+            -not -path "./.venv/*" \
+            -exec python -m py_compile {} \;

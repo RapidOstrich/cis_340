@@ -1,0 +1,5 @@
+[dependency-groups]
+dev = [
+    "black",
+    "flake8",
+]
