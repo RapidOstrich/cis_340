@@ -49,13 +49,15 @@ Verify the installation:
 uv --version
 ```
 
-#### Create the Virtual Environment
+#### Install Project Dependencies
 
-From the root of the repository:
+From the root of the repository, run:
 
 ```bash
-uv venv
+uv sync
 ```
+
+This creates the virtual environment and installs all dependencies in one step.
 
 #### Configure PyCharm to Use the uv Environment
 
@@ -79,12 +81,46 @@ uv venv
 
 6. Click **OK** and apply the changes.
 
-#### Install Project Dependencies
+### 2.4 Set Up Pre-Commit Hooks
 
-If the repository contains a `pyproject.toml` file, install dependencies with:
+Pre-commit hooks automatically check your code for formatting and style issues before each commit. Run this once after cloning:
 
 ```bash
-uv sync
+uv run pre-commit install
 ```
 
-PyCharm will now use the project's virtual environment for development and execution.
+After this, every `git commit` will run the checks automatically. If a check fails, fix the reported issues and commit again.
+
+## 3. Workflow
+
+The `main` branch is protected — changes cannot be pushed directly. All work must go through a pull request:
+
+1. Create a new branch from `main`:
+
+```bash
+git checkout main
+git checkout -b your-branch-name
+```
+
+2. Make your changes and commit them.
+3. Push the branch to GitHub:
+
+```bash
+git push origin your-branch-name
+```
+
+4. Open a pull request into `main` on GitHub and merge once the CI pipeline passes.
+
+## 4. CI Pipeline
+
+Every push and pull request runs the **Python CI** pipeline on GitHub Actions, which checks:
+
+| Step | Tool | What it catches |
+|---|---|---|
+| Formatting | black | Code that isn't formatted consistently |
+| Style | flake8 | Bad patterns, unused imports, line length |
+| Syntax | py_compile | Python files that can't be parsed |
+
+You can also trigger the pipeline manually from the **Actions** tab on GitHub using the **Run workflow** button.
+
+If the pipeline fails on your pull request, read the error output, fix the issue locally, and push again.
